@@ -17,6 +17,8 @@ export (Vector2) var anim_pos = Vector2.ZERO
 var move_on = true
 var current_anim = ""
 
+var armed = false
+
 var on_ground = true
 var jump_count = 0
 export var double_jump = false
@@ -31,6 +33,10 @@ func stop_animation():
 
 func _ready() -> void:
 	pass
+
+func _input(event: InputEvent):
+	if event.is_action_pressed("Attack"):
+		armed = true
 
 func _physics_process(_delta):
 	var direction = get_direction()
@@ -112,11 +118,18 @@ func set_animation(direction: Vector2):
 	animation_tree.set("parameters/conditions/second_jump", jump_count == 2 && !double_jump)
 	animation_tree.set("parameters/corner_climb_0/TimeScale/scale", 2.0)
 	if is_on_floor():
-		if direction.x == 0 or is_on_wall():
-			state_machine.travel("idle_0")
+		if armed:
+			if direction.x == 0 or is_on_wall():
+				state_machine.travel("idle_1")
+			else:
+				state_machine.travel("run_1")
 		else:
-			state_machine.travel("run_0")
+			if direction.x == 0 or is_on_wall():
+				state_machine.travel("idle_0")
+			else:
+				state_machine.travel("run_0")
 	else:
+		armed = false
 		if !is_climbing:
 			if direction.y == -1:
 				state_machine.travel("jump_loop_0")
