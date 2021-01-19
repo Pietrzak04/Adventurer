@@ -9,6 +9,7 @@ onready var animation_tree = $AnimationTree
 onready var animation_player = $AnimationPlayer
 onready var head_cast = $HeadCast
 onready var body_cast = $BodyCast
+onready var camera = $Camera2D
 
 const FLOOR_DETECT_DISTANCE = 5.0
 
@@ -46,7 +47,7 @@ func _physics_process(_delta):
 		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y > 0.0 else Vector2.ZERO
 		
 		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
-		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, !is_on_platform, 4, 0.9)
+		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4,  0.9, false)
 	else:
 		match current_anim:
 			"climb":
@@ -66,9 +67,13 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 	else:
 		out.x = lerp(out.x, 0, friction)
 	
-	head_cast.force_raycast_update()
-	body_cast.force_raycast_update()
+	if head_cast.enabled or body_cast.enabled:
+		head_cast.force_raycast_update()
+		body_cast.force_raycast_update()
 	if body_cast.is_colliding() and !head_cast.is_colliding():
+		if Input.is_action_pressed("Crouch"):
+			head_cast.enabled = false
+			body_cast.enabled = false
 		is_climbing = true
 		jump_count = 1
 		out.y = 0
@@ -86,6 +91,8 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 		out.y *= 0.6
 	
 	if is_on_floor():
+		head_cast.enabled = true
+		body_cast.enabled = true
 		if on_ground == false:
 			double_jump = false
 			on_ground = true
@@ -105,7 +112,7 @@ func set_animation(direction: Vector2):
 	animation_tree.set("parameters/conditions/second_jump", jump_count == 2 && !double_jump)
 	animation_tree.set("parameters/corner_climb_0/TimeScale/scale", 2.0)
 	if is_on_floor():
-		if direction.x == 0:
+		if direction.x == 0 or is_on_wall():
 			state_machine.travel("idle_0")
 		else:
 			state_machine.travel("run_0")
@@ -125,3 +132,4 @@ func set_direction(direction: Vector2):
 		sprite.scale.x = 1 if direction.x > 0 else -1
 		head_cast.scale.x = 1 if direction.x > 0 else -1
 		body_cast.scale.x = 1 if direction.x > 0 else -1
+		camera.position.x = 35 if direction.x > 0 else -35
