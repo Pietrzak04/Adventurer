@@ -10,6 +10,7 @@ onready var animation_player = $AnimationPlayer
 onready var head_cast = $HeadCast
 onready var body_cast = $BodyCast
 onready var camera = $Camera2D
+onready var sword_hide = $SwordHide
 
 const FLOOR_DETECT_DISTANCE = 5.0
 
@@ -47,9 +48,6 @@ func _physics_process(_delta):
 		var is_jump_interrupted = Input.is_action_just_released("Jump") and _velocity.y < 0.0
 		var is_on_platform = ground.is_colliding()
 		
-		if Input.is_action_pressed("test_button"):
-			animation_player.play("corner_climb_0")
-		
 		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y > 0.0 else Vector2.ZERO
 		
 		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
@@ -58,6 +56,10 @@ func _physics_process(_delta):
 		match current_anim:
 			"climb":
 				self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
+			"sword_up":
+				sword_hide.start(4)
+			"sword_down":
+				pass
 
 func get_direction():
 	return Vector2(
@@ -76,15 +78,15 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 	if head_cast.enabled or body_cast.enabled:
 		head_cast.force_raycast_update()
 		body_cast.force_raycast_update()
-	if body_cast.is_colliding() and !head_cast.is_colliding():
+	
+	is_climbing = body_cast.is_colliding() and !head_cast.is_colliding()
+	if is_climbing:
 		if Input.is_action_pressed("Crouch"):
 			head_cast.enabled = false
 			body_cast.enabled = false
-		is_climbing = true
 		jump_count = 1
 		out.y = 0
 	else:
-		is_climbing = false
 		out.y += gravity * get_physics_process_delta_time()
 	
 	if direction.y == -1.0 and !is_climbing:
@@ -122,6 +124,7 @@ func set_animation(direction: Vector2):
 			if direction.x == 0 or is_on_wall():
 				state_machine.travel("idle_1")
 			else:
+				sword_hide.start(4)
 				state_machine.travel("run_1")
 		else:
 			if direction.x == 0 or is_on_wall():
@@ -146,3 +149,9 @@ func set_direction(direction: Vector2):
 		head_cast.scale.x = 1 if direction.x > 0 else -1
 		body_cast.scale.x = 1 if direction.x > 0 else -1
 		camera.position.x = 35 if direction.x > 0 else -35
+
+
+func _on_SwordHide_timeout() -> void:
+	if armed:
+		state_machine.travel("idle_0")
+		armed = false
