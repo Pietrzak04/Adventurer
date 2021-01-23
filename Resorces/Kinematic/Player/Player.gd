@@ -11,6 +11,8 @@ onready var head_cast = $HeadCast
 onready var body_cast = $BodyCast
 onready var camera = $Camera2D
 onready var sword_hide = $SwordHide
+onready var attack_reset = $AttackReset
+onready var attack_next = $AttackNext
 
 const FLOOR_DETECT_DISTANCE = 5.0
 
@@ -19,6 +21,7 @@ var move_on = true
 var current_anim = ""
 
 var armed = false
+var attack_points = 3
 
 var on_ground = true
 var jump_count = 0
@@ -35,20 +38,24 @@ func stop_animation():
 func _ready() -> void:
 	pass
 
-func _input(event: InputEvent):
-	if event.is_action_pressed("Attack"):
+func input():
+	if Input.is_action_just_pressed("Attack"):
 		armed = true
 
 func _physics_process(_delta):
 	var direction = get_direction()
 	set_direction(direction)
 	set_animation(direction)
+	input()
 	
 	if move_on:
 		var is_jump_interrupted = Input.is_action_just_released("Jump") and _velocity.y < 0.0
 		var is_on_platform = ground.is_colliding()
 		
 		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y > 0.0 else Vector2.ZERO
+		
+		if Input.is_action_just_pressed("test_button"):
+			attack_points = 3
 		
 		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
 		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4,  0.9, false)
@@ -121,7 +128,30 @@ func set_animation(direction: Vector2):
 	animation_tree.set("parameters/corner_climb_0/TimeScale/scale", 2.0)
 	if is_on_floor():
 		if armed:
-			if direction.x == 0 or is_on_wall():
+			if Input.is_action_just_pressed("Attack") and state_machine.get_current_node() != "sword_up_0":
+				match attack_points:
+					1:
+						if attack_next.is_stopped() and state_machine.get_current_node() == "attack_1":
+							sword_hide.start(4)
+							attack_reset.start(0.8)
+							attack_points -= 1
+							attack_next.start(0.4)
+							state_machine.travel("attack_2")
+					2:
+						if attack_next.is_stopped() and state_machine.get_current_node() == "attack_0":
+							sword_hide.start(4)
+							attack_reset.start(0.8)
+							attack_points -= 1
+							attack_next.start(0.4)
+							state_machine.travel("attack_1")
+					3:
+						sword_hide.start(4)
+						attack_reset.start(0.8)
+						attack_next.start(0.4)
+						attack_points = attack_points - 1
+						state_machine.travel("attack_0")
+			
+			elif direction.x == 0 or is_on_wall():
 				state_machine.travel("idle_1")
 			else:
 				sword_hide.start(4)
@@ -155,3 +185,8 @@ func _on_SwordHide_timeout() -> void:
 	if armed:
 		state_machine.travel("idle_0")
 		armed = false
+
+
+func _on_AttackReset_timeout() -> void:
+	if state_machine.get_current_node() != "attack_0" or state_machine.get_current_node() != "attack_1" or state_machine.get_current_node() != "attack_2":
+		attack_points = 3
