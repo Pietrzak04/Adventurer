@@ -1,4 +1,4 @@
-[gd_scene load_steps=135 format=2]
+[gd_scene load_steps=136 format=2]
 
 [ext_resource path="res://Assets/Player/Sprite/adventurer-attack2-05.png" type="Texture" id=1]
 [ext_resource path="res://Assets/Player/Sprite/adventurer-attack2-03.png" type="Texture" id=2]
@@ -948,6 +948,9 @@ graph_offset = Vector2( -993, -641 )
 
 [sub_resource type="RectangleShape2D" id=68]
 
+[sub_resource type="RectangleShape2D" id=69]
+extents = Vector2( 5, 15 )
+
 [node name="Player" type="KinematicBody2D"]
 script = ExtResource( 16 )
 gravity = 800.0
@@ -1028,9 +1031,17 @@ one_shot = true
 [node name="AttackArea" type="Area2D" parent="."]
 
 [node name="AttackColision" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2( 22, -15 )
+position = Vector2( 21, -15 )
 shape = SubResource( 68 )
 disabled = true
+
+[node name="MoveArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MoveArea"]
+position = Vector2( 12, -15 )
+shape = SubResource( 69 )
 [connection signal="timeout" from="SwordHide" to="." method="_on_SwordHide_timeout"]
 [connection signal="timeout" from="AttackReset" to="." method="_on_AttackReset_timeout"]
 [connection signal="body_entered" from="AttackArea" to="." method="_on_AttackArea_body_entered"]
+[connection signal="body_entered" from="MoveArea" to="." method="_on_MoveArea_body_entered"]
+[connection signal="body_exited" from="MoveArea" to="." method="_on_MoveArea_body_exited"]

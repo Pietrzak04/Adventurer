@@ -14,6 +14,7 @@ onready var sword_hide = $SwordHide
 onready var attack_reset = $AttackReset
 onready var attack_next = $AttackNext
 onready var attack_area = $AttackArea
+onready var move_area = $MoveArea
 
 const FLOOR_DETECT_DISTANCE = 5.0
 
@@ -23,6 +24,8 @@ var current_anim = ""
 
 var armed = false
 var attack_points = 3
+
+var on_wall = false
 
 var on_ground = true
 var jump_count = 0
@@ -61,6 +64,7 @@ func _physics_process(_delta):
 		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
 		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4,  0.9, false)
 	else:
+		print(on_wall)
 		match current_anim:
 			"climb":
 				self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
@@ -69,11 +73,14 @@ func _physics_process(_delta):
 			"sword_down":
 				pass
 			"attack_0":
-				self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
+				if !on_wall:
+					self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
 			"attack_1":
-				self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
+				if !on_wall:
+					self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
 			"attack_2":
-				self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
+				if !on_wall:
+					self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
 
 func get_direction():
 	return Vector2(
@@ -199,3 +206,12 @@ func _on_AttackReset_timeout() -> void:
 func _on_AttackArea_body_entered(body: Node) -> void:
 	if body.is_in_group("enemies"):
 		body.hurt()
+
+func _on_MoveArea_body_entered(body: Node) -> void:
+	if body is TileMap:
+		on_wall = true
+
+
+func _on_MoveArea_body_exited(body: Node) -> void:
+	if body is TileMap:
+		on_wall = false
