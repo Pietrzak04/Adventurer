@@ -949,7 +949,7 @@ graph_offset = Vector2( -993, -641 )
 [sub_resource type="RectangleShape2D" id=68]
 
 [sub_resource type="RectangleShape2D" id=69]
-extents = Vector2( 5, 15 )
+extents = Vector2( 1, 15 )
 
 [node name="Player" type="KinematicBody2D"]
 script = ExtResource( 16 )
@@ -961,7 +961,7 @@ double_jump = true
 position = Vector2( 0, -18 )
 frames = SubResource( 1 )
 animation = "idle_0"
-frame = 3
+frame = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -15 )
@@ -1038,7 +1038,7 @@ disabled = true
 [node name="MoveArea" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MoveArea"]
-position = Vector2( 12, -15 )
+position = Vector2( 8, -15 )
 shape = SubResource( 69 )
 [connection signal="timeout" from="SwordHide" to="." method="_on_SwordHide_timeout"]
 [connection signal="timeout" from="AttackReset" to="." method="_on_AttackReset_timeout"]
