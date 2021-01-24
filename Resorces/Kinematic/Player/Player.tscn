@@ -1,4 +1,4 @@
-[gd_scene load_steps=134 format=2]
+[gd_scene load_steps=135 format=2]
 
 [ext_resource path="res://Assets/Player/Sprite/adventurer-attack2-05.png" type="Texture" id=1]
 [ext_resource path="res://Assets/Player/Sprite/adventurer-attack2-03.png" type="Texture" id=2]
@@ -79,11 +79,6 @@ animations = [ {
 "name": "run_0",
 "speed": 10.0
 }, {
-"frames": [ ExtResource( 36 ), ExtResource( 6 ), ExtResource( 12 ), ExtResource( 37 ) ],
-"loop": true,
-"name": "jump_0",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 45 ), ExtResource( 51 ), ExtResource( 50 ), ExtResource( 46 ), ExtResource( 47 ), ExtResource( 52 ) ],
 "loop": true,
 "name": "corner_climb_0",
@@ -94,24 +89,9 @@ animations = [ {
 "name": "sword_down_0",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 34 ), ExtResource( 26 ), ExtResource( 22 ), ExtResource( 2 ), ExtResource( 4 ), ExtResource( 1 ) ],
-"loop": true,
-"name": "attack_1",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 63 ), ExtResource( 62 ), ExtResource( 61 ), ExtResource( 66 ), ExtResource( 64 ), ExtResource( 65 ) ],
-"loop": true,
-"name": "run_1",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 32 ), ExtResource( 3 ), ExtResource( 10 ), ExtResource( 23 ), ExtResource( 5 ), ExtResource( 13 ) ],
 "loop": true,
 "name": "attack_2",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 39 ), ExtResource( 40 ), ExtResource( 42 ), ExtResource( 41 ) ],
-"loop": true,
-"name": "double_jump_0",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 27 ), ExtResource( 14 ), ExtResource( 28 ), ExtResource( 38 ) ],
@@ -124,9 +104,29 @@ animations = [ {
 "name": "idle_0",
 "speed": 8.0
 }, {
-"frames": [ ExtResource( 44 ), ExtResource( 43 ), ExtResource( 48 ), ExtResource( 49 ) ],
+"frames": [ ExtResource( 39 ), ExtResource( 40 ), ExtResource( 42 ), ExtResource( 41 ) ],
 "loop": true,
-"name": "corner_grab_0",
+"name": "double_jump_0",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 63 ), ExtResource( 62 ), ExtResource( 61 ), ExtResource( 66 ), ExtResource( 64 ), ExtResource( 65 ) ],
+"loop": true,
+"name": "run_1",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 34 ), ExtResource( 26 ), ExtResource( 22 ), ExtResource( 2 ), ExtResource( 4 ), ExtResource( 1 ) ],
+"loop": true,
+"name": "attack_1",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 9 ), ExtResource( 15 ), ExtResource( 33 ), ExtResource( 8 ), ExtResource( 11 ) ],
+"loop": true,
+"name": "attack_0",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 36 ), ExtResource( 6 ), ExtResource( 12 ), ExtResource( 37 ) ],
+"loop": true,
+"name": "jump_0",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 35 ), ExtResource( 7 ) ],
@@ -134,9 +134,9 @@ animations = [ {
 "name": "fall_0",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 9 ), ExtResource( 15 ), ExtResource( 33 ), ExtResource( 8 ), ExtResource( 11 ) ],
+"frames": [ ExtResource( 44 ), ExtResource( 43 ), ExtResource( 48 ), ExtResource( 49 ) ],
 "loop": true,
-"name": "attack_0",
+"name": "corner_grab_0",
 "speed": 5.0
 } ]
 
@@ -146,7 +146,6 @@ extents = Vector2( 7, 15 )
 [sub_resource type="Animation" id=3]
 resource_name = "attack_0"
 length = 0.6
-loop = true
 step = 0.01
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
@@ -172,11 +171,51 @@ tracks/1/keys = {
 "update": 1,
 "values": [ 0, 1, 2, 3, 4 ]
 }
+tracks/2/type = "method"
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.6 ),
+"transitions": PoolRealArray( 1, 1 ),
+"values": [ {
+"args": [ "attack_0" ],
+"method": "animation"
+}, {
+"args": [  ],
+"method": "stop_animation"
+} ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath(".:anim_pos")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.12, 0.24, 0.38, 0.5, 0.6 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( 0.8, 0 ), Vector2( 0.1, 0 ), Vector2( 0, 0 ), Vector2( 0, 0 ), Vector2( 0, 0 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("AttackArea/AttackColision:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.6 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ false, true ]
+}
 
 [sub_resource type="Animation" id=4]
 resource_name = "attack_1"
 length = 0.6
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -200,6 +239,47 @@ tracks/1/keys = {
 "transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
 "update": 1,
 "values": [ 0, 1, 2, 3, 4, 5 ]
+}
+tracks/2/type = "method"
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.6 ),
+"transitions": PoolRealArray( 1, 1 ),
+"values": [ {
+"args": [ "attack_1" ],
+"method": "animation"
+}, {
+"args": [  ],
+"method": "stop_animation"
+} ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath(".:anim_pos")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( 0, 0 ), Vector2( 0.4, 0 ), Vector2( 0.4, 0 ), Vector2( 0.2, 0 ), Vector2( 0, 0 ), Vector2( 0, 0 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("AttackArea/AttackColision:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.6 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ false, true ]
 }
 
 [sub_resource type="Animation" id=5]
@@ -228,6 +308,47 @@ tracks/1/keys = {
 "transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
 "update": 1,
 "values": [ 0, 1, 2, 3, 4, 5 ]
+}
+tracks/2/type = "method"
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.6 ),
+"transitions": PoolRealArray( 1, 1 ),
+"values": [ {
+"args": [ "attack_2" ],
+"method": "animation"
+}, {
+"args": [  ],
+"method": "stop_animation"
+} ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath(".:anim_pos")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( 0.2, 0 ), Vector2( 0.8, 0 ), Vector2( 0.8, 0 ), Vector2( 0.8, 0 ), Vector2( 0.8, 0 ), Vector2( 0, 0 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("AttackArea/AttackColision:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.6 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ false, true ]
 }
 
 [sub_resource type="Animation" id=6]
@@ -825,11 +946,12 @@ graph_offset = Vector2( -993, -641 )
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id=67]
 
+[sub_resource type="RectangleShape2D" id=68]
+
 [node name="Player" type="KinematicBody2D"]
 script = ExtResource( 16 )
 gravity = 800.0
 speed = Vector2( 170, 300 )
-anim_pos = Vector2( 2, 0 )
 double_jump = true
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
@@ -902,5 +1024,13 @@ one_shot = true
 
 [node name="AttackNext" type="Timer" parent="."]
 one_shot = true
+
+[node name="AttackArea" type="Area2D" parent="."]
+
+[node name="AttackColision" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2( 22, -15 )
+shape = SubResource( 68 )
+disabled = true
 [connection signal="timeout" from="SwordHide" to="." method="_on_SwordHide_timeout"]
 [connection signal="timeout" from="AttackReset" to="." method="_on_AttackReset_timeout"]
+[connection signal="body_entered" from="AttackArea" to="." method="_on_AttackArea_body_entered"]

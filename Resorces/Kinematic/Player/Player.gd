@@ -13,6 +13,7 @@ onready var camera = $Camera2D
 onready var sword_hide = $SwordHide
 onready var attack_reset = $AttackReset
 onready var attack_next = $AttackNext
+onready var attack_area = $AttackArea
 
 const FLOOR_DETECT_DISTANCE = 5.0
 
@@ -67,12 +68,17 @@ func _physics_process(_delta):
 				sword_hide.start(4)
 			"sword_down":
 				pass
+			"attack_0":
+				self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
+			"attack_1":
+				self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
+			"attack_2":
+				self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
 
 func get_direction():
 	return Vector2(
 		Input.get_action_strength("Right") - Input.get_action_strength("Left"),
-		-1 if Input.is_action_just_pressed("Jump") else 0
-	)
+		-1 if Input.is_action_just_pressed("Jump") else 0)
 
 func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction: Vector2, is_jump_interrupted: bool):
 	var out: = linear_velocity
@@ -179,14 +185,17 @@ func set_direction(direction: Vector2):
 		head_cast.scale.x = 1 if direction.x > 0 else -1
 		body_cast.scale.x = 1 if direction.x > 0 else -1
 		camera.position.x = 35 if direction.x > 0 else -35
-
+		attack_area.scale.x = 1 if direction.x  > 0 else -1
 
 func _on_SwordHide_timeout() -> void:
 	if armed:
 		state_machine.travel("idle_0")
 		armed = false
 
-
 func _on_AttackReset_timeout() -> void:
 	if state_machine.get_current_node() != "attack_0" or state_machine.get_current_node() != "attack_1" or state_machine.get_current_node() != "attack_2":
 		attack_points = 3
+
+func _on_AttackArea_body_entered(body: Node) -> void:
+	if body.is_in_group("enemies"):
+		body.hurt()
