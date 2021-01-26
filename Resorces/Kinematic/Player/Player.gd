@@ -14,13 +14,11 @@ onready var sword_hide = $SwordHide
 onready var attack_reset = $AttackReset
 onready var attack_next = $AttackNext
 onready var attack_area = $AttackArea
-onready var move_area = $MoveArea
 
 const FLOOR_DETECT_DISTANCE = 5.0
 
 export (Vector2) var anim_pos = Vector2.ZERO
 var move_on = true
-var current_anim = ""
 
 var armed = false
 var attack_points = 3
@@ -34,11 +32,13 @@ var is_climbing = false
 
 func animation(var animation_name):
 	move_on = false
-	current_anim = animation_name
+	match animation_name:
+		"sword_up":
+			sword_hide.start(4)
 
 func stop_animation():
 	move_on = true
-
+	
 func _ready() -> void:
 	pass
 
@@ -58,29 +58,11 @@ func _physics_process(_delta):
 		
 		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y > 0.0 else Vector2.ZERO
 		
-		if Input.is_action_just_pressed("test_button"):
-			attack_points = 3
-		
 		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
 		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4,  0.9, false)
 	else:
-		print(on_wall)
-		match current_anim:
-			"climb":
-				self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
-			"sword_up":
-				sword_hide.start(4)
-			"sword_down":
-				pass
-			"attack_0":
-				if !on_wall:
-					self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
-			"attack_1":
-				if !on_wall:
-					self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
-			"attack_2":
-				if !on_wall:
-					self.global_position += anim_pos * Vector2(sprite.scale.x, 1.0)
+		_velocity = anim_pos * Vector2(sprite.scale.x, 1.0)
+		_velocity = move_and_slide_with_snap(_velocity,Vector2.DOWN * FLOOR_DETECT_DISTANCE, FLOOR_NORMAL)
 
 func get_direction():
 	return Vector2(
@@ -206,12 +188,3 @@ func _on_AttackReset_timeout() -> void:
 func _on_AttackArea_body_entered(body: Node) -> void:
 	if body.is_in_group("enemies"):
 		body.hurt()
-
-func _on_MoveArea_body_entered(body: Node) -> void:
-	if body is TileMap:
-		on_wall = true
-
-
-func _on_MoveArea_body_exited(body: Node) -> void:
-	if body is TileMap:
-		on_wall = false
