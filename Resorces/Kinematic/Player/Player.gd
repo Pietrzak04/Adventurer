@@ -25,6 +25,8 @@ var attack_points = 3
 
 var on_wall = false
 
+var celling = false;
+var crouch_speed = 50
 var on_ground = true
 var jump_count = 0
 export var double_jump = false
@@ -43,8 +45,10 @@ func _ready() -> void:
 	pass
 
 func input():
-	if Input.is_action_just_pressed("Attack"):
+	if Input.is_action_just_pressed("Attack") and !celling:
 		armed = true
+	if Input.is_action_just_pressed("Crouch"):
+		armed = false
 
 func _physics_process(_delta):
 	var direction = get_direction()
@@ -73,7 +77,10 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 	var out: = linear_velocity
 	
 	if direction.x != 0:
-		out.x = lerp(out.x, direction.x * speed.x, acceleration)
+		if Input.is_action_pressed("Crouch") or celling:
+			out.x = lerp(out.x, direction.x * crouch_speed, acceleration)
+		else:
+			out.x = lerp(out.x, direction.x * speed.x, acceleration)
 	else:
 		out.x = lerp(out.x, 0, friction)
 	
@@ -101,8 +108,13 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 		out.y *= 0.6
 	
 	if is_on_floor():
-		head_cast.enabled = true
-		body_cast.enabled = true
+		if (Input.is_action_pressed("Crouch") or celling):
+			print("yes")	
+			head_cast.enabled = false
+			body_cast.enabled = false
+		else:
+			head_cast.enabled = true
+			body_cast.enabled = true
 		if on_ground == false:
 			double_jump = false
 			on_ground = true
@@ -152,10 +164,16 @@ func set_animation(direction: Vector2):
 				sword_hide.start(4)
 				state_machine.travel("run_1")
 		else:
-			if direction.x == 0 or is_on_wall():
-				state_machine.travel("idle_0")
+			if Input.is_action_pressed("Crouch") or celling:
+				if direction.x == 0 or is_on_wall():
+					state_machine.travel("crouch_idle_0")
+				else:
+					state_machine.travel("crouch_walk_0")
 			else:
-				state_machine.travel("run_0")
+				if direction.x == 0 or is_on_wall():
+					state_machine.travel("idle_0")
+				else:
+					state_machine.travel("run_0")
 	else:
 		armed = false
 		if !is_climbing:
@@ -188,3 +206,11 @@ func _on_AttackReset_timeout() -> void:
 func _on_AttackArea_body_entered(body: Node) -> void:
 	if body.is_in_group("enemies"):
 		body.hurt()
+
+func _on_CellingArea_body_entered(body: Node) -> void:
+	if body is TileMap:
+		celling = true
+
+func _on_CellingArea_body_exited(body: Node) -> void:
+	if body is TileMap:
+		celling = false
