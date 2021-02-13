@@ -15,7 +15,7 @@ onready var attack_reset = $AttackReset
 onready var attack_next = $AttackNext
 onready var attack_area = $AttackArea
 
-const FLOOR_DETECT_DISTANCE = 5.0
+const FLOOR_DETECT_DISTANCE = 10.0
 
 export (Vector2) var anim_pos = Vector2.ZERO
 var move_on = true
@@ -60,7 +60,7 @@ func _physics_process(_delta):
 		var is_jump_interrupted = Input.is_action_just_released("Jump") and _velocity.y < 0.0
 		var is_on_platform = ground.is_colliding()
 		
-		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y > 0.0 else Vector2.ZERO
+		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y == 0.0 else Vector2.ZERO
 		
 		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
 		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4,  0.9, false)
@@ -87,7 +87,7 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 	if head_cast.enabled or body_cast.enabled:
 		head_cast.force_raycast_update()
 		body_cast.force_raycast_update()
-	
+	print(body_cast.is_colliding())
 	is_climbing = body_cast.is_colliding() and !head_cast.is_colliding()
 	if is_climbing:
 		if Input.is_action_pressed("Crouch"):
@@ -191,6 +191,8 @@ func set_direction(direction: Vector2):
 		sprite.scale.x = 1 if direction.x > 0 else -1
 		head_cast.scale.x = 1 if direction.x > 0 else -1
 		body_cast.scale.x = 1 if direction.x > 0 else -1
+		head_cast.position.x = -2 if direction.x > 0 else 2
+		body_cast.position.x = -2 if direction.x > 0 else 2
 		camera.position.x = 35 if direction.x > 0 else -35
 		attack_area.scale.x = 1 if direction.x  > 0 else -1
 
