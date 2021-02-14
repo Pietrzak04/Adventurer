@@ -78,59 +78,9 @@
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
-"frames": [ ExtResource( 52 ), ExtResource( 74 ), ExtResource( 68 ), ExtResource( 75 ), ExtResource( 73 ), ExtResource( 70 ) ],
-"loop": true,
-"name": "crouch_walk_0",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 58 ), ExtResource( 56 ), ExtResource( 59 ), ExtResource( 57 ) ],
-"loop": true,
-"name": "sword_down_0",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 63 ), ExtResource( 62 ), ExtResource( 61 ), ExtResource( 66 ), ExtResource( 64 ), ExtResource( 65 ) ],
-"loop": true,
-"name": "run_1",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 44 ), ExtResource( 43 ), ExtResource( 48 ), ExtResource( 49 ) ],
-"loop": true,
-"name": "corner_grab_0",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 32 ), ExtResource( 3 ), ExtResource( 10 ), ExtResource( 23 ), ExtResource( 5 ), ExtResource( 13 ) ],
-"loop": true,
-"name": "attack_2",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 18 ), ExtResource( 20 ), ExtResource( 25 ), ExtResource( 21 ) ],
-"loop": true,
-"name": "idle_0",
-"speed": 8.0
-}, {
-"frames": [ ExtResource( 9 ), ExtResource( 15 ), ExtResource( 33 ), ExtResource( 8 ), ExtResource( 11 ) ],
-"loop": true,
-"name": "attack_0",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 34 ), ExtResource( 26 ), ExtResource( 22 ), ExtResource( 2 ), ExtResource( 4 ), ExtResource( 1 ) ],
 "loop": true,
 "name": "attack_1",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 60 ), ExtResource( 55 ), ExtResource( 53 ), ExtResource( 54 ) ],
-"loop": true,
-"name": "sword_up_0",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 36 ), ExtResource( 6 ), ExtResource( 12 ), ExtResource( 37 ) ],
-"loop": true,
-"name": "jump_0",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 45 ), ExtResource( 51 ), ExtResource( 50 ), ExtResource( 46 ), ExtResource( 47 ), ExtResource( 52 ) ],
-"loop": true,
-"name": "corner_climb_0",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 71 ), ExtResource( 72 ), ExtResource( 67 ), ExtResource( 69 ) ],
@@ -138,9 +88,14 @@ animations = [ {
 "name": "crouch_idle_0",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 27 ), ExtResource( 14 ), ExtResource( 28 ), ExtResource( 38 ) ],
+"frames": [ ExtResource( 63 ), ExtResource( 62 ), ExtResource( 61 ), ExtResource( 66 ), ExtResource( 64 ), ExtResource( 65 ) ],
 "loop": true,
-"name": "idle_1",
+"name": "run_1",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 35 ), ExtResource( 7 ) ],
+"loop": true,
+"name": "fall_0",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 24 ), ExtResource( 29 ), ExtResource( 30 ), ExtResource( 17 ), ExtResource( 31 ), ExtResource( 19 ) ],
@@ -148,14 +103,59 @@ animations = [ {
 "name": "run_0",
 "speed": 10.0
 }, {
-"frames": [ ExtResource( 35 ), ExtResource( 7 ) ],
+"frames": [ ExtResource( 58 ), ExtResource( 56 ), ExtResource( 59 ), ExtResource( 57 ) ],
 "loop": true,
-"name": "fall_0",
+"name": "sword_down_0",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 32 ), ExtResource( 3 ), ExtResource( 10 ), ExtResource( 23 ), ExtResource( 5 ), ExtResource( 13 ) ],
+"loop": true,
+"name": "attack_2",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 27 ), ExtResource( 14 ), ExtResource( 28 ), ExtResource( 38 ) ],
+"loop": true,
+"name": "idle_1",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 45 ), ExtResource( 51 ), ExtResource( 50 ), ExtResource( 46 ), ExtResource( 47 ), ExtResource( 52 ) ],
+"loop": true,
+"name": "corner_climb_0",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 18 ), ExtResource( 20 ), ExtResource( 25 ), ExtResource( 21 ) ],
+"loop": true,
+"name": "idle_0",
+"speed": 8.0
+}, {
+"frames": [ ExtResource( 44 ), ExtResource( 43 ), ExtResource( 48 ), ExtResource( 49 ) ],
+"loop": true,
+"name": "corner_grab_0",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 52 ), ExtResource( 74 ), ExtResource( 68 ), ExtResource( 75 ), ExtResource( 73 ), ExtResource( 70 ) ],
+"loop": true,
+"name": "crouch_walk_0",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 9 ), ExtResource( 15 ), ExtResource( 33 ), ExtResource( 8 ), ExtResource( 11 ) ],
+"loop": true,
+"name": "attack_0",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 60 ), ExtResource( 55 ), ExtResource( 53 ), ExtResource( 54 ) ],
+"loop": true,
+"name": "sword_up_0",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 39 ), ExtResource( 40 ), ExtResource( 42 ), ExtResource( 41 ) ],
 "loop": true,
 "name": "double_jump_0",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 36 ), ExtResource( 6 ), ExtResource( 12 ), ExtResource( 37 ) ],
+"loop": true,
+"name": "jump_0",
 "speed": 5.0
 } ]
 
@@ -1113,7 +1113,7 @@ states/sword_up_0/node = SubResource( 38 )
 states/sword_up_0/position = Vector2( -117, -260 )
 transitions = [ "run_0", "idle_0", SubResource( 39 ), "idle_0", "run_0", SubResource( 40 ), "idle_0", "jump_0", SubResource( 41 ), "jump_0", "jump_loop_0", SubResource( 42 ), "fall_0", "idle_0", SubResource( 43 ), "jump_loop_0", "fall_0", SubResource( 44 ), "fall_0", "double_jump_0", SubResource( 45 ), "double_jump_0", "fall_0", SubResource( 46 ), "jump_loop_0", "double_jump_0", SubResource( 47 ), "corner_climb_0", "idle_0", SubResource( 48 ), "corner_grab_0", "corner_climb_0", SubResource( 49 ), "jump_loop_0", "corner_grab_0", SubResource( 50 ), "fall_0", "corner_grab_0", SubResource( 51 ), "double_jump_0", "corner_grab_0", SubResource( 52 ), "corner_grab_0", "fall_0", SubResource( 53 ), "idle_0", "sword_up_0", SubResource( 54 ), "sword_down_0", "idle_0", SubResource( 55 ), "sword_up_0", "idle_1", SubResource( 56 ), "idle_1", "sword_down_0", SubResource( 57 ), "run_1", "idle_1", SubResource( 58 ), "idle_1", "run_1", SubResource( 59 ), "idle_1", "jump_0", SubResource( 60 ), "idle_0", "corner_grab_0", SubResource( 61 ), "idle_1", "attack_0", SubResource( 62 ), "attack_0", "idle_1", SubResource( 63 ), "idle_1", "attack_1", SubResource( 64 ), "attack_1", "idle_1", SubResource( 65 ), "idle_1", "attack_2", SubResource( 66 ), "attack_2", "idle_1", SubResource( 67 ), "attack_0", "attack_1", SubResource( 68 ), "attack_1", "attack_2", SubResource( 69 ), "idle_0", "crouch_idle_0", SubResource( 70 ), "crouch_idle_0", "crouch_walk_0", SubResource( 71 ), "crouch_walk_0", "crouch_idle_0", SubResource( 72 ), "crouch_idle_0", "idle_0", SubResource( 73 ), "double_jump_0", "idle_0", SubResource( 74 ) ]
 start_node = "idle_0"
-graph_offset = Vector2( -773, -277 )
+graph_offset = Vector2( -797, -58 )
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id=76]
 
@@ -1134,7 +1134,6 @@ radius = 2.0
 script = ExtResource( 16 )
 gravity = 800.0
 speed = Vector2( 170, 300 )
-anim_pos = Vector2( 0, -75 )
 double_jump = true
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]

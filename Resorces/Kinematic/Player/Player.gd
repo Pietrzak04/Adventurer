@@ -53,7 +53,6 @@ func input():
 func _physics_process(_delta):
 	var direction = get_direction()
 	set_direction(direction)
-	set_animation(direction)
 	input()
 	
 	if move_on:
@@ -61,8 +60,11 @@ func _physics_process(_delta):
 		var is_on_platform = ground.is_colliding()
 		
 		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y == 0.0 else Vector2.ZERO
+		if is_climbing:
+			snap_vector = Vector2.ZERO
 		
 		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
+		set_animation(direction, _velocity)
 		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4,  0.9, false)
 	else:
 		_velocity = anim_pos * Vector2(sprite.scale.x, 1.0)
@@ -87,7 +89,7 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 	if head_cast.enabled or body_cast.enabled:
 		head_cast.force_raycast_update()
 		body_cast.force_raycast_update()
-	print(body_cast.is_colliding())
+	
 	is_climbing = body_cast.is_colliding() and !head_cast.is_colliding()
 	if is_climbing:
 		if Input.is_action_pressed("Crouch"):
@@ -109,7 +111,6 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 	
 	if is_on_floor():
 		if (Input.is_action_pressed("Crouch") or celling):
-			print("yes")	
 			head_cast.enabled = false
 			body_cast.enabled = false
 		else:
@@ -125,11 +126,11 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 			jump_count = 1
 	
 	if is_on_ceiling():
-		jump_count = 1
+		jump_count = 2
 	
 	return out
 
-func set_animation(direction: Vector2):
+func set_animation(direction: Vector2, vel: Vector2):
 	animation_tree.set("parameters/conditions/is_on_ground", is_on_floor())
 	animation_tree.set("parameters/conditions/second_jump", jump_count == 2 && !double_jump)
 	animation_tree.set("parameters/corner_climb_0/TimeScale/scale", 2.0)
@@ -177,7 +178,7 @@ func set_animation(direction: Vector2):
 	else:
 		armed = false
 		if !is_climbing:
-			if direction.y == -1:
+			if vel.y < 0 and jump_count < 2:
 				state_machine.travel("jump_loop_0")
 			else:
 				state_machine.travel("fall_0")
