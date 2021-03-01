@@ -15,6 +15,9 @@ onready var attack_reset = $AttackReset
 onready var attack_next = $AttackNext
 onready var attack_area = $AttackArea
 
+signal health_changed(value)
+signal in_hand_changed(value)
+
 const FLOOR_DETECT_DISTANCE = 10.0
 
 export (Vector2) var anim_pos = Vector2.ZERO
@@ -24,6 +27,15 @@ var armed = false
 var attack_points = 3
 
 var on_wall = false
+
+# czy gracz ma coś w ręce (łuk lub czar)
+var in_hand = true #ręka false łuk
+var CurrentArrow = 1
+var CurrentHand = 1
+
+var health = 100
+var max_health = 100
+var lifes = 5
 
 var celling = false;
 var crouch_speed = 50
@@ -42,16 +54,42 @@ func stop_animation():
 	move_on = true
 	
 func _ready() -> void:
-	pass
+	emit_signal("health_changed", health)
+	emit_signal("in_hand_changed", in_hand)
 
 func input():
+	if Input.is_action_just_pressed("test_button"):
+		health -= 10
+		emit_signal("health_changed", health)
 	if Input.is_action_just_pressed("Attack") and !celling:
 		armed = true
 	if Input.is_action_just_pressed("Crouch"):
 		armed = false
+	if in_hand:
+		if Input.is_action_just_pressed("slot1"):
+			CurrentHand = 1
+		elif Input.is_action_just_pressed("slot2"):
+			CurrentHand = 2
+		elif Input.is_action_just_pressed("slot3"):
+			CurrentHand = 3
+		elif Input.is_action_just_pressed("slot4"):
+			CurrentHand = 4
+	else:
+		if Input.is_action_just_pressed("slot1"):
+			CurrentArrow = 1
+		elif Input.is_action_just_pressed("slot2"):
+			CurrentArrow = 2
+		elif Input.is_action_just_pressed("slot3"):
+			CurrentArrow = 3
+		elif Input.is_action_just_pressed("slot4"):
+			CurrentArrow = 4
+	if Input.is_action_just_pressed("In_hand"):
+		in_hand = !in_hand
+		emit_signal("in_hand_changed", in_hand)
 
 func _physics_process(_delta):
 	var direction = get_direction()
+	set_animation(direction, _velocity)
 	set_direction(direction)
 	input()
 	
@@ -63,8 +101,7 @@ func _physics_process(_delta):
 		if is_climbing:
 			snap_vector = Vector2.ZERO
 		
-		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
-		set_animation(direction, _velocity)
+		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted, is_on_platform)
 		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4,  0.9, false)
 	else:
 		_velocity = anim_pos * Vector2(sprite.scale.x, 1.0)
@@ -75,7 +112,7 @@ func get_direction():
 		Input.get_action_strength("Right") - Input.get_action_strength("Left"),
 		-1 if Input.is_action_just_pressed("Jump") else 0)
 
-func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction: Vector2, is_jump_interrupted: bool):
+func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction: Vector2, is_jump_interrupted: bool, is_on_plarform: bool):
 	var out: = linear_velocity
 	
 	if direction.x != 0:
@@ -153,10 +190,10 @@ func set_animation(direction: Vector2, vel: Vector2):
 							attack_next.start(0.4)
 							state_machine.travel("attack_1")
 					3:
+						attack_points -= 1
 						sword_hide.start(4)
 						attack_reset.start(0.8)
 						attack_next.start(0.4)
-						attack_points = attack_points - 1
 						state_machine.travel("attack_0")
 			
 			elif direction.x == 0 or is_on_wall():
@@ -196,6 +233,12 @@ func set_direction(direction: Vector2):
 		body_cast.position.x = -2 if direction.x > 0 else 2
 		camera.position.x = 35 if direction.x > 0 else -35
 		attack_area.scale.x = 1 if direction.x  > 0 else -1
+
+func hit(damage: int):
+	pass
+
+func kill():
+	pass
 
 func _on_SwordHide_timeout() -> void:
 	if armed:
