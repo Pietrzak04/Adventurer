@@ -14,5 +14,5 @@ func _on_Player_health_changed(value):
 
 
 func _on_Player_in_hand_changed(value) -> void:
-	texture_bow.visible = value
-	texture_hand.visible = !value
+	texture_bow.visible = !value
+	texture_hand.visible = value
