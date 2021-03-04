@@ -14,8 +14,15 @@ onready var sword_hide = $SwordHide
 onready var attack_reset = $AttackReset
 onready var attack_next = $AttackNext
 onready var attack_area = $AttackArea
+onready var cooldown = $ItemCooldown
 
-const FLOOR_DETECT_DISTANCE = 5.0
+onready var item_position = $ItemPosition
+
+signal health_changed(value)
+signal in_hand_changed(value)
+
+var pre_item_array = [preload("res://Resorces/Kinematic/Items/TnT.tscn"),null,null,null,null,null,null,null]
+const FLOOR_DETECT_DISTANCE = 10.0
 
 export (Vector2) var anim_pos = Vector2.ZERO
 var move_on = true
@@ -23,46 +30,84 @@ var move_on = true
 var armed = false
 var attack_points = 3
 
-var on_wall = false
+# czy gracz ma coś w ręce (łuk lub czar)
+var in_hand = true #ręka false łuk
+var CurrentArrow = 0
+var CurrentHand = 0
+
+var max_health = 100
+var health = max_health
+var lifes = 5
 
 var celling = false;
 var crouch_speed = 50
 var on_ground = true
 var jump_count = 0
-export var double_jump = false
+var double_jump = false
 var is_climbing = false
+
+func _ready() -> void:
+	emit_signal("health_changed", health)
+	emit_signal("in_hand_changed", in_hand)
 
 func animation(var animation_name):
 	move_on = false
 	match animation_name:
 		"sword_up":
 			sword_hide.start(4)
+		"throw":
+			cooldown.start(0.5)
+
+func make_item_instant(var item_number):
+	if cooldown.is_stopped():
+		var item_instance = pre_item_array[item_number].instance()
+		item_instance.position = item_position.global_position
+		get_parent().add_child(item_instance)
 
 func stop_animation():
 	move_on = true
-	
-func _ready() -> void:
-	pass
 
 func input():
 	if Input.is_action_just_pressed("Attack") and !celling:
 		armed = true
 	if Input.is_action_just_pressed("Crouch"):
 		armed = false
+	if in_hand:
+		if Input.is_action_just_pressed("slot1"):
+			CurrentHand = 0
+		elif Input.is_action_just_pressed("slot2"):
+			CurrentHand = 1
+		elif Input.is_action_just_pressed("slot3"):
+			CurrentHand = 2
+		elif Input.is_action_just_pressed("slot4"):
+			CurrentHand = 3
+	else:
+		if Input.is_action_just_pressed("slot1"):
+			CurrentArrow = 0
+		elif Input.is_action_just_pressed("slot2"):
+			CurrentArrow = 1
+		elif Input.is_action_just_pressed("slot3"):
+			CurrentArrow = 2
+		elif Input.is_action_just_pressed("slot4"):
+			CurrentArrow = 3
+	if Input.is_action_just_pressed("In_hand"):
+		in_hand = !in_hand
+		emit_signal("in_hand_changed", in_hand)
 
 func _physics_process(_delta):
 	var direction = get_direction()
+	set_animation(direction, _velocity)
 	set_direction(direction)
-	set_animation(direction)
 	input()
-	
 	if move_on:
 		var is_jump_interrupted = Input.is_action_just_released("Jump") and _velocity.y < 0.0
 		var is_on_platform = ground.is_colliding()
 		
-		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y > 0.0 else Vector2.ZERO
+		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y == 0.0 else Vector2.ZERO
+		if is_climbing:
+			snap_vector = Vector2.ZERO
 		
-		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
+		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted, is_on_platform)
 		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4,  0.9, false)
 	else:
 		_velocity = anim_pos * Vector2(sprite.scale.x, 1.0)
@@ -73,7 +118,7 @@ func get_direction():
 		Input.get_action_strength("Right") - Input.get_action_strength("Left"),
 		-1 if Input.is_action_just_pressed("Jump") else 0)
 
-func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction: Vector2, is_jump_interrupted: bool):
+func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction: Vector2, is_jump_interrupted: bool, is_on_plarform: bool):
 	var out: = linear_velocity
 	
 	if direction.x != 0:
@@ -109,7 +154,6 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 	
 	if is_on_floor():
 		if (Input.is_action_pressed("Crouch") or celling):
-			print("yes")	
 			head_cast.enabled = false
 			body_cast.enabled = false
 		else:
@@ -125,11 +169,11 @@ func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction
 			jump_count = 1
 	
 	if is_on_ceiling():
-		jump_count = 1
+		jump_count = 2
 	
 	return out
 
-func set_animation(direction: Vector2):
+func set_animation(direction: Vector2, vel: Vector2):
 	animation_tree.set("parameters/conditions/is_on_ground", is_on_floor())
 	animation_tree.set("parameters/conditions/second_jump", jump_count == 2 && !double_jump)
 	animation_tree.set("parameters/corner_climb_0/TimeScale/scale", 2.0)
@@ -152,10 +196,10 @@ func set_animation(direction: Vector2):
 							attack_next.start(0.4)
 							state_machine.travel("attack_1")
 					3:
+						attack_points -= 1
 						sword_hide.start(4)
 						attack_reset.start(0.8)
 						attack_next.start(0.4)
-						attack_points = attack_points - 1
 						state_machine.travel("attack_0")
 			
 			elif direction.x == 0 or is_on_wall():
@@ -174,10 +218,33 @@ func set_animation(direction: Vector2):
 					state_machine.travel("idle_0")
 				else:
 					state_machine.travel("run_0")
+			if Input.is_action_just_pressed("Attack_range") and cooldown.is_stopped():
+				if in_hand:
+					match CurrentHand:
+						0:
+							state_machine.travel("throw_0")
+							make_item_instant(0)
+						1:
+							pass
+						2:
+							pass
+						3:
+							pass
+				else:
+					match CurrentArrow:
+						0:
+							pass
+						1:
+							pass
+						2:
+							pass
+						3:
+							pass
+				
 	else:
 		armed = false
 		if !is_climbing:
-			if direction.y == -1:
+			if vel.y < 0 and jump_count < 2:
 				state_machine.travel("jump_loop_0")
 			else:
 				state_machine.travel("fall_0")
@@ -191,8 +258,17 @@ func set_direction(direction: Vector2):
 		sprite.scale.x = 1 if direction.x > 0 else -1
 		head_cast.scale.x = 1 if direction.x > 0 else -1
 		body_cast.scale.x = 1 if direction.x > 0 else -1
+		head_cast.position.x = -2 if direction.x > 0 else 2
+		body_cast.position.x = -2 if direction.x > 0 else 2
 		camera.position.x = 35 if direction.x > 0 else -35
 		attack_area.scale.x = 1 if direction.x  > 0 else -1
+		item_position.position.x = 10 if direction.x  > 0 else -10
+
+func hit(damage: int):
+	pass
+
+func kill():
+	pass
 
 func _on_SwordHide_timeout() -> void:
 	if armed:
