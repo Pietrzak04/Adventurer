@@ -9,6 +9,7 @@ extents = Vector2( 16, 6 )
 "platforms",
 ]]
 collision_layer = 4
+collision_mask = 25
 motion/sync_to_physics = true
 
 [node name="Sprite" type="Sprite" parent="."]

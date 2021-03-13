@@ -6,7 +6,7 @@
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 8, 5 )
 
-[sub_resource type="Animation" id=3]
+[sub_resource type="Animation" id=2]
 resource_name = "fade_in"
 length = 0.5
 tracks/0/type = "value"
@@ -34,8 +34,7 @@ tracks/1/keys = {
 "values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
 }
 
-[sub_resource type="Animation" id=2]
-resource_name = "fade_out"
+[sub_resource type="Animation" id=3]
 length = 0.5
 tracks/0/type = "value"
 tracks/0/path = NodePath("CollisionShape2D:disabled")
@@ -64,6 +63,7 @@ tracks/1/keys = {
 
 [node name="FadeingPlatform" type="KinematicBody2D"]
 collision_layer = 4
+collision_mask = 25
 script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
@@ -76,8 +76,8 @@ shape = SubResource( 1 )
 one_way_collision = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/fade_in = SubResource( 3 )
-anims/fade_out = SubResource( 2 )
+anims/fade_in = SubResource( 2 )
+anims/fade_out = SubResource( 3 )
 
 [node name="Timer" type="Timer" parent="."]
 autostart = true

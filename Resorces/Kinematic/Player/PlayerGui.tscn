@@ -1,0 +1,175 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://Resorces/Kinematic/Player/GUI.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Fonts/monogram32.tres" type="DynamicFont" id=2]
+[ext_resource path="res://Assets/Player/GUI/item_bar.png" type="Texture" id=3]
+[ext_resource path="res://Assets/Player/GUI/bow_icon.png" type="Texture" id=4]
+[ext_resource path="res://Assets/Player/GUI/score_bar.png" type="Texture" id=5]
+[ext_resource path="res://Assets/Player/GUI/progres_bar.png" type="Texture" id=6]
+[ext_resource path="res://Assets/Player/GUI/life_bar.png" type="Texture" id=7]
+[ext_resource path="res://Assets/Player/GUI/HP_bar.png" type="Texture" id=8]
+[ext_resource path="res://Assets/Player/GUI/arm_icon.png" type="Texture" id=9]
+
+[node name="GUI" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HPBar" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_scale = Vector2( 1.3, 1.3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="HPBar"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 238.0
+margin_bottom = 106.0
+texture = ExtResource( 8 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureProgress" type="TextureProgress" parent="HPBar"]
+margin_left = 110.0
+margin_top = 26.0
+margin_right = 100.0
+margin_bottom = 40.0
+value = 50.0
+texture_progress = ExtResource( 6 )
+tint_progress = Color( 0.741176, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureHand" type="TextureRect" parent="HPBar"]
+margin_left = 28.0
+margin_top = 28.0
+margin_right = 82.0
+margin_bottom = 78.0
+rect_scale = Vector2( 1.2, 1.2 )
+texture = ExtResource( 9 )
+
+[node name="TextureBow" type="TextureRect" parent="HPBar"]
+margin_left = 28.0
+margin_top = 28.0
+margin_right = 76.0
+margin_bottom = 76.0
+rect_scale = Vector2( 1.2, 1.2 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ScoreBar" type="Control" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+rect_scale = Vector2( 1.3, 1.3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="ScoreBar"]
+margin_left = -200.0
+margin_top = 14.0
+margin_right = -44.0
+margin_bottom = 54.0
+rect_scale = Vector2( 1.3, 1.3 )
+texture = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ScoreLabel" type="Label" parent="ScoreBar/TextureRect"]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = 27.2189
+margin_top = -14.7929
+margin_right = 3.21887
+margin_bottom = 11.2071
+custom_fonts/font = ExtResource( 2 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+text = "00000000"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GemPoint" type="Node2D" parent="ScoreBar/TextureRect"]
+position = Vector2( 14.2012, 20 )
+
+[node name="TextureRect2" type="TextureRect" parent="ScoreBar"]
+margin_left = -130.0
+margin_top = 72.0
+margin_right = 2.0
+margin_bottom = 112.0
+texture = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ScoreLabel2" type="Label" parent="ScoreBar/TextureRect2"]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = 83.0
+margin_top = -15.0
+margin_right = -25.0
+margin_bottom = 11.0
+custom_fonts/font = ExtResource( 2 )
+text = "00"
+
+[node name="TextureRect4" type="TextureRect" parent="ScoreBar"]
+margin_left = -130.0
+margin_top = 122.0
+margin_right = 2.0
+margin_bottom = 162.0
+texture = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ScoreLabel4" type="Label" parent="ScoreBar/TextureRect4"]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = 83.0
+margin_top = -15.0
+margin_right = -25.0
+margin_bottom = 11.0
+custom_fonts/font = ExtResource( 2 )
+text = "00"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect3" type="TextureRect" parent="ScoreBar"]
+margin_left = -106.0
+margin_top = 173.0
+margin_right = 2.0
+margin_bottom = 213.0
+texture = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ScoreLabel4" type="Label" parent="ScoreBar/TextureRect3"]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = 27.5385
+margin_top = -14.5385
+margin_right = -56.4615
+margin_bottom = 11.4615
+custom_fonts/font = ExtResource( 2 )
+text = "00"
+__meta__ = {
+"_edit_use_anchors_": false
+}

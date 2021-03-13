@@ -3,6 +3,7 @@ extends Kinematic
 class_name Player
 
 onready var ground = $Ground
+onready var ground2 = $Ground2
 onready var sprite = $AnimatedSprite
 onready var state_machine = $AnimationTree.get("parameters/playback")
 onready var animation_tree = $AnimationTree
@@ -20,8 +21,13 @@ onready var item_position = $ItemPosition
 
 signal health_changed(value)
 signal in_hand_changed(value)
+signal score_changed(value)
+signal life_changed(value)
 
-var pre_item_array = [preload("res://Resorces/Kinematic/Items/TnT.tscn"),null,null,null,null,null,null,null]
+var pre_item_array = [preload("res://Resorces/Kinematic/Items/TnT.tscn"),preload("res://Resorces/Kinematic/Items/FireBall.tscn"),null,null,null,null,null,null]
+var item_array = [10,10,10,10,10,10,10,10]
+var item_animation_name = ["throw_0", "spell_1"]
+
 const FLOOR_DETECT_DISTANCE = 10.0
 
 export (Vector2) var anim_pos = Vector2.ZERO
@@ -38,6 +44,7 @@ var CurrentHand = 0
 var max_health = 100
 var health = max_health
 var lifes = 5
+var score = 0
 
 var celling = false;
 var crouch_speed = 50
@@ -46,28 +53,54 @@ var jump_count = 0
 var double_jump = false
 var is_climbing = false
 
-func _ready() -> void:
+func _ready():
 	emit_signal("health_changed", health)
 	emit_signal("in_hand_changed", in_hand)
+	emit_signal("score_changed", score)
+	emit_signal("life_changed", lifes)
 
 func animation(var animation_name):
 	move_on = false
 	match animation_name:
 		"sword_up":
 			sword_hide.start(4)
-		"throw":
-			cooldown.start(0.5)
 
 func make_item_instant(var item_number):
-	if cooldown.is_stopped():
-		var item_instance = pre_item_array[item_number].instance()
-		item_instance.position = item_position.global_position
-		get_parent().add_child(item_instance)
+	var item_instance = pre_item_array[item_number].instance()
+	item_instance.position = item_position.global_position
+	get_parent().add_child(item_instance)
+
+func new_instance():
+	if in_hand:
+		item_position.position = set_item_position(item_animation_name[CurrentHand])
+		make_item_instant(CurrentHand)
+		item_array[CurrentHand] -= 1
+		cooldown.start(0.5)
+	else:
+		state_machine.travel(item_animation_name[CurrentArrow + 4])
+		item_position.position = set_item_position(item_animation_name[CurrentArrow])
+		make_item_instant(CurrentArrow + 4)
+		item_array[CurrentArrow + 4] -= 1
+		cooldown.start(0.5)
+
+func set_item_position(var anim_name):
+	var new_position = item_position.position
+	
+	match anim_name:
+		"throw_0":
+			new_position = Vector2(10 * sprite.scale.x,-11)
+		"spell_1":
+			new_position = Vector2(15 * sprite.scale.x,-15)
+	
+	return new_position
 
 func stop_animation():
 	move_on = true
 
 func input():
+	if Input.is_action_pressed("test_button"):
+		score += 100000
+		emit_signal("score_changed", score)
 	if Input.is_action_just_pressed("Attack") and !celling:
 		armed = true
 	if Input.is_action_just_pressed("Crouch"):
@@ -101,13 +134,13 @@ func _physics_process(_delta):
 	input()
 	if move_on:
 		var is_jump_interrupted = Input.is_action_just_released("Jump") and _velocity.y < 0.0
-		var is_on_platform = ground.is_colliding()
+		var is_on_platform = ground.is_colliding() or ground2.is_colliding()
 		
 		var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if direction.y == 0.0 else Vector2.ZERO
 		if is_climbing:
 			snap_vector = Vector2.ZERO
 		
-		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted, is_on_platform)
+		_velocity = calculate_move_velocity(_velocity, speed, direction, is_jump_interrupted)
 		_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4,  0.9, false)
 	else:
 		_velocity = anim_pos * Vector2(sprite.scale.x, 1.0)
@@ -118,7 +151,7 @@ func get_direction():
 		Input.get_action_strength("Right") - Input.get_action_strength("Left"),
 		-1 if Input.is_action_just_pressed("Jump") else 0)
 
-func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction: Vector2, is_jump_interrupted: bool, is_on_plarform: bool):
+func calculate_move_velocity(linear_velocity: Vector2, speed: Vector2, direction: Vector2, is_jump_interrupted: bool):
 	var out: = linear_velocity
 	
 	if direction.x != 0:
@@ -220,27 +253,11 @@ func set_animation(direction: Vector2, vel: Vector2):
 					state_machine.travel("run_0")
 			if Input.is_action_just_pressed("Attack_range") and cooldown.is_stopped():
 				if in_hand:
-					match CurrentHand:
-						0:
-							state_machine.travel("throw_0")
-							make_item_instant(0)
-						1:
-							pass
-						2:
-							pass
-						3:
-							pass
+					if item_array[CurrentHand] > 0:
+						state_machine.travel(item_animation_name[CurrentHand])
 				else:
-					match CurrentArrow:
-						0:
-							pass
-						1:
-							pass
-						2:
-							pass
-						3:
-							pass
-				
+					if item_array[CurrentArrow + 4] > 0:
+						state_machine.travel(item_animation_name[CurrentArrow + 4])
 	else:
 		armed = false
 		if !is_climbing:
@@ -262,31 +279,35 @@ func set_direction(direction: Vector2):
 		body_cast.position.x = -2 if direction.x > 0 else 2
 		camera.position.x = 35 if direction.x > 0 else -35
 		attack_area.scale.x = 1 if direction.x  > 0 else -1
-		item_position.position.x = 10 if direction.x  > 0 else -10
 
 func hit(damage: int):
 	pass
 
 func kill():
+	
 	pass
 
-func _on_SwordHide_timeout() -> void:
+func add_score(var new_score):
+	score += new_score
+	emit_signal("score_changed", score)
+
+func _on_SwordHide_timeout():
 	if armed:
 		state_machine.travel("idle_0")
 		armed = false
 
-func _on_AttackReset_timeout() -> void:
+func _on_AttackReset_timeout():
 	if state_machine.get_current_node() != "attack_0" or state_machine.get_current_node() != "attack_1" or state_machine.get_current_node() != "attack_2":
 		attack_points = 3
 
-func _on_AttackArea_body_entered(body: Node) -> void:
+func _on_AttackArea_body_entered(body: Node):
 	if body.is_in_group("enemies"):
 		body.hurt()
 
-func _on_CellingArea_body_entered(body: Node) -> void:
+func _on_CellingArea_body_entered(body: Node):
 	if body is TileMap:
 		celling = true
 
-func _on_CellingArea_body_exited(body: Node) -> void:
+func _on_CellingArea_body_exited(body: Node):
 	if body is TileMap:
 		celling = false

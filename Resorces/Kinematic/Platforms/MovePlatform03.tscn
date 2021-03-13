@@ -10,8 +10,8 @@ extents = Vector2( 24, 6 )
 script = ExtResource( 2 )
 
 [node name="Platform" type="KinematicBody2D" parent="."]
-collision_layer = 5
-collision_mask = 7
+collision_layer = 4
+collision_mask = 25
 motion/sync_to_physics = true
 
 [node name="Left" type="Sprite" parent="Platform"]
